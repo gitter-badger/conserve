@@ -15,6 +15,10 @@ duralib/proto/__init__.py duralib/proto/dura_pb2.py: proto/dura.proto
 	touch duralib/proto/__init__.py
 	protoc --python_out=duralib/ proto/dura.proto
 
+# Building the Go protos needs <http://code.google.com/p/goprotobuf/>
+proto/dura.pb.go: proto/dura.proto
+	protoc --go_out=. proto/dura.proto
+
 messages.pot:
 	pygettext dura duralib/*.py
 
