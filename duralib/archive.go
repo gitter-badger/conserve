@@ -7,7 +7,10 @@ import (
 	"github.com/sourcefrog/dura/proto"
 	"io"
 	"os"
+	"path"
 )
+
+const header_filename = "DURA-ARCHIVE"
 
 // Should be within the header protobuf, to identify the archive.
 const archive_magic = "dura backup archive"
@@ -18,7 +21,8 @@ type Archive struct {
 func readArchiveHeader(archive_dir string) (
 	header duralib_proto.ArchiveHeader,
 	err error) {
-	header_file, err := os.Open(archive_dir + "/DURA-ARCHIVE")
+	header_path := path.Join(archive_dir, header_filename)
+	header_file, err := os.Open(header_path)
 	if err != nil {
 		return
 	}
@@ -78,4 +82,3 @@ func DescribeArchive(archive_dir string) error {
 	}
 	return nil
 }
-
