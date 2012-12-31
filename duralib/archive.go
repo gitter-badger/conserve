@@ -9,6 +9,9 @@ import (
 	"os"
 )
 
+// Should be within the header protobuf, to identify the archive.
+const archive_magic = "dura backup archive"
+
 type Archive struct {
 }
 
@@ -42,7 +45,7 @@ func readArchiveHeader(archive_dir string) (
 	return header, nil
 }
 
-func OpenArchive(archive_dir string) (archive Archive, err error) {
+func OpenArchive(archive_dir string) (archive *Archive, err error) {
 	dir_stat, err := os.Stat(archive_dir)
 	if err != nil {
 		return
@@ -58,7 +61,13 @@ func OpenArchive(archive_dir string) (archive Archive, err error) {
 	fmt.Printf("flags: read=%v, write=%v\n", header.RequiredReadFlags,
 		header.RequiredWriteFlags)
 
-	return Archive{}, nil
+	if *header.Magic != archive_magic {
+		return nil, errors.New(
+			fmt.Sprintf("wrong header magic in %s: %q",
+				archive_dir, *header.Magic))
+	}
+
+	return &Archive{}, nil
 }
 
 func DescribeArchive(archive_dir string) error {
