@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 namespace conserve {
 

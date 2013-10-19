@@ -20,10 +20,7 @@
 
 #include <glog/logging.h>
 
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "archive.h"
 #include "band.h"
@@ -35,6 +32,7 @@ namespace conserve {
 using namespace std;
 
 using namespace boost;
+using namespace conserve::proto;
 
 
 const string Archive::_HARDCODED_SINGLE_BAND = "0000";
@@ -42,31 +40,28 @@ const string Archive::HEAD_NAME = "CONSERVE";
 const string Archive::ARCHIVE_MAGIC = "conserve archive";
 
 
-Archive::Archive(const path& base_dir, bool create) :
+Archive::Archive(const path& base_dir) :
     base_dir_(base_dir)
 {
-    // TODO: Maybe separate class or function for creation rather than a bool?
-    if (create) {
-        LOG(INFO) << "create archive in " << base_dir_;
-        filesystem::create_directory(base_dir_);
-        write_archive_head();
-    } else {
-        LOG(INFO) << "open archive in " << base_dir_;
-        path head_path = base_dir / HEAD_NAME;
-        read_proto_from_file(head_path, &head_pb_, "archive", "head");
-        if (head_pb_.magic() != ARCHIVE_MAGIC) {
-            Problem("archive", "head", "bad-magic", head_path,
-                    string("wrong magic: \"") + head_pb_.magic() + "\""
-                    ).signal();
-        }
+    LOG(INFO) << "open archive in " << base_dir_;
+    path head_path = base_dir / HEAD_NAME;
+    read_proto_from_file(head_path, head_pb_, "archive", "head");
+    string actualMagic = head_pb_.getMagic();
+    if (actualMagic != ARCHIVE_MAGIC) {
+        Problem("archive", "head", "bad-magic", head_path,
+                string("wrong magic: \"") + actualMagic + "\""
+                ).signal();
     }
 }
 
 
-void Archive::write_archive_head() {
-    LOG(INFO) << "create archive in " << base_dir_;
-    head_pb_.set_magic(ARCHIVE_MAGIC);
-    write_proto_to_file(head_pb_, base_dir_/HEAD_NAME);
+void Archive::create(const path& base_dir) {
+    LOG(INFO) << "create archive in " << base_dir;
+    filesystem::create_directory(base_dir);
+    ::capnp::MallocMessageBuilder message;
+    ArchiveHead::Builder head_pb = message.initRoot<ArchiveHead>();
+    head_pb.setMagic(ARCHIVE_MAGIC);
+    write_proto_to_file(head_pb, base_dir / HEAD_NAME);
 }
 
 

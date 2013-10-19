@@ -28,3 +28,7 @@ install-sh
 missing
 build
 man/conserve.1
+proto/conserve.capnp.c++
+proto/conserve.capnp.h
+.dirstamp
+compile

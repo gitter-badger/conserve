@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <bzlib.h>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "datareader.h"
 

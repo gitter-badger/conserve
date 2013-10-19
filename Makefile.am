@@ -1,15 +1,19 @@
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
+
+ACLOCAL_AMFLAGS = -I acinclude
 
 bin_PROGRAMS = conserve
 
 check: cram-tests
 
-CXXFLAGS=-Wall -ggdb
+CXXFLAGS += -Wall
+
 LDADD=-lprotobuf -lboost_filesystem -lboost_system -lglog -lbz2
 
 nodist_conserve_SOURCES = proto/conserve.pb.cc
 
-BUILT_SOURCES = proto/conserve.pb.h proto/conserve.pb.cc
+BUILT_SOURCES = proto/conserve.capnp.c++ \
+	proto/conserve.capnp.h
 
 conserve_SOURCES = \
 	src/archive.cc \
@@ -43,8 +47,8 @@ conserve_SOURCES = \
 	src/validate.cc \
 	src/validate.h
 
-proto/conserve.pb.cc proto/conserve.pb.h: proto/conserve.proto
-	protoc --cpp_out=. --proto_path $(srcdir) $<
+proto/conserve.capnp.c++ proto/conserve.capnp.h: proto/conserve.capnp
+	capnp compile -oc++:. $<
 
 check-staged:
 	t=`mktemp -d` && \
@@ -65,7 +69,7 @@ cram-tests: conserve $(cram_tests)
 update-cram: conserve $(cram_tests)
 	PATH=`pwd`:$$PATH cram $(CRAM_OPTIONS) -i $(srcdir)/tests/*md
 
-CLEANFILES = proto/conserve.pb.h proto/conserve.pb.cc
+CLEANFILES = proto/conserve.capnp.c++ proto/conserve.capnp.h
 
 EXTRA_DIST = \
 	proto/conserve.proto \

@@ -13,6 +13,8 @@
 
 #include <string>
 
+#include <capnp/dynamic.h>
+
 namespace conserve {
 
 using namespace boost::filesystem;
@@ -24,12 +26,12 @@ namespace proto {
 };
 
 void write_proto_to_file(
-        const google::protobuf::Message& message,
+        const ::capnp::DynamicStruct::Builder& message,
         const boost::filesystem::path& path);
 
 void read_proto_from_file(
         const path& path,
-        google::protobuf::Message* message,
+        ::capnp::DynamicStruct::Reader& message,
         const string& object,
         const string& part);
 

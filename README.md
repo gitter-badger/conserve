@@ -83,10 +83,12 @@ Dependencies
 Ubuntu/Debian package names:
 
     libprotobuf-dev
-    clang
-    protobuf-compiler
+    clang or g++
     make
     libgoogle-glog-dev
+    capnp
+    automake
+    autoconf
 
 To run the tests, [cram](https://pypi.python.org/pypi/cram) is needed:
 

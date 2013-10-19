@@ -17,7 +17,7 @@
 #include "string"
 #include <boost/filesystem.hpp>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 namespace conserve {
 
@@ -28,7 +28,9 @@ class BandWriter;
 
 class Archive {
 public:
-    Archive(const path& base_dir, bool create);
+    Archive(const path& base_dir);
+
+    static void create(const path& base_dir);
 
     string last_band_name();
     BandWriter start_band();
@@ -40,7 +42,7 @@ public:
 private:
     // TODO: Obviously, support multiple bands.
     static const string _HARDCODED_SINGLE_BAND;
-    conserve::proto::ArchiveHead head_pb_;
+    conserve::proto::ArchiveHead::Reader head_pb_;
     static const string ARCHIVE_MAGIC;
 
     void write_archive_head();
