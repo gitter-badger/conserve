@@ -61,7 +61,7 @@ void Archive::create(const path& base_dir) {
     ::capnp::MallocMessageBuilder message;
     ArchiveHead::Builder head_pb = message.initRoot<ArchiveHead>();
     head_pb.setMagic(ARCHIVE_MAGIC);
-    write_proto_to_file(head_pb, base_dir / HEAD_NAME);
+    write_packed_message_to_file(message, base_dir / HEAD_NAME);
 }
 
 

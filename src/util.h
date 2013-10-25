@@ -13,7 +13,7 @@
 
 #include <string>
 
-#include <capnp/dynamic.h>
+#include <capnp/serialize.h>
 
 namespace conserve {
 
@@ -25,13 +25,12 @@ namespace proto {
     class Path;
 };
 
-void write_proto_to_file(
-        const ::capnp::DynamicStruct::Builder& message,
+void write_packed_message_to_file(
+        ::capnp::MessageBuilder& message,
         const boost::filesystem::path& path);
 
-void read_proto_from_file(
+capnp::MessageReader *read_packed_message_from_file(
         const path& path,
-        ::capnp::DynamicStruct::Reader& message,
         const string& object,
         const string& part);
 
@@ -39,11 +38,11 @@ std::string gethostname_str();
 
 void break_path(
         const boost::filesystem::path &from_path,
-        conserve::proto::Path *to_path_proto);
+        conserve::proto::Path::Builder *to_path_proto);
 
-path unpack_path(const conserve::proto::Path &proto_path);
+path unpack_path(const conserve::proto::Path::Reader &proto_path);
 
-void populate_stamp(conserve::proto::Stamp *stamp);
+void populate_stamp(conserve::proto::Stamp::Builder *stamp);
 }
 
 // vim: sw=4 et
