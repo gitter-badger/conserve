@@ -37,7 +37,7 @@ using namespace conserve::proto;
 
 const string Archive::_HARDCODED_SINGLE_BAND = "0000";
 const string Archive::HEAD_NAME = "CONSERVE";
-const string Archive::ARCHIVE_MAGIC = "conserve archive";
+const string Archive::ARCHIVE_MAGIC = "conserve archive 1.0 (capnp-packed)";
 
 
 Archive::Archive(const path& base_dir) :

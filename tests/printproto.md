@@ -3,7 +3,7 @@ control file in human-readable form:
 
     $ conserve init a
     $ conserve printproto a/CONSERVE
-    magic: "conserve archive"
+    magic: "conserve archive 1.0 (capnp-packed)"
 
 printproto takes exactly one argument:
 
