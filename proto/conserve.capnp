@@ -72,13 +72,12 @@ struct BandTail {
 }
 
 
-# A file path, as a sequence of components.  To make a unix relative path
-# they can joined up with slashes.
 
 struct Path {
-    # This is generally utf-8, but stored as bytes
-    # so it can cope with anomalously named files.
-    part @0 :List(Data);
+    # A file path, as a sequence of components.  To make a unix relative path
+    # they can joined up with slashes.  Components must be UTF-8.
+ 
+    part @0 :List(Text);
 }
 
 
