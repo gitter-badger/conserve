@@ -14,11 +14,13 @@
 #include <string>
 
 #include <capnp/serialize.h>
+#include <capnp/serialize-packed.h>
 #include "proto/conserve.capnp.h"
 
 namespace conserve {
 
 using namespace boost::filesystem;
+using namespace capnp;
 using namespace conserve::proto;
 using namespace std;
 
@@ -30,6 +32,17 @@ capnp::MessageReader *read_packed_message_from_file(
         const path& path,
         const string& object,
         const string& part);
+
+template<typename T> typename T::Reader read_from_packed_file(
+        const path& path,
+        const string& object,
+        const string& part) {
+    unique_ptr<MessageReader> reader(
+        read_packed_message_from_file(
+            path, object, part));
+    return reader->getRoot<T>();
+}
+
 
 std::string gethostname_str();
 

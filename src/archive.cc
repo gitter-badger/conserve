@@ -48,10 +48,8 @@ Archive::Archive(const path& base_dir) :
     LOG(INFO) << "open archive in " << base_dir_;
     path head_path = base_dir / HEAD_NAME;
 
-    unique_ptr<MessageReader> reader(
-        read_packed_message_from_file(
-            head_path, "archive", "head"));
-    head_pb_ = reader->getRoot<ArchiveHead>();
+    head_pb_ = read_from_packed_file<ArchiveHead>(
+        head_path, "archive", "head");
 
     string actualMagic = head_pb_.getMagic();
     if (actualMagic != ARCHIVE_MAGIC) {

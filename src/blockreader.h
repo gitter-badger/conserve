@@ -43,7 +43,7 @@ public:
 
 private:
     DataReader data_reader_;
-    proto::BlockIndex index_pb_;
+    proto::BlockIndex::Reader index_pb_;
     int file_number_;
 };
 

@@ -106,18 +106,15 @@ BandReader::BandReader(Archive *archive, string name) :
     Band(archive, name),
     current_block_number_(-1)
 {
-    unique_ptr<MessageReader> head_reader(
-        read_packed_message_from_file(
-            head_file_name(), "band", "head"));
-    head_pb_ = head_reader->getRoot<BandHead>();
+    head_pb_ = read_from_packed_file<BandHead>(
+        head_file_name(), "band", "head");
 
-    unique_ptr<MessageReader> tail_reader(
-        read_packed_message_from_file(
-            tail_file_name(), "band", "tail"));
-    tail_pb_ = tail_reader->getRoot<BandTail>();
+    tail_pb_ = read_from_packed_file<BandTail>(
+        tail_file_name(), "band", "tail");
 
     LOG(INFO) << "start reading band " << head_pb_.getBandId().getBandNumber();
-    CHECK(head_pb_.getBandId().getBandNumber() == tail_pb_.getBandId().getBandNumber());
+    CHECK(head_pb_.getBandId().getBandNumber()
+          == tail_pb_.getBandId().getBandNumber());
     CHECK(tail_pb_.getBlockCount() >= 0);
 }
 
