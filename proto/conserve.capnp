@@ -15,7 +15,7 @@ struct Stamp {
 }
 
 struct ArchiveHead {
-    # One ArchiveHeader in '/CONSERVE' in the root of the archive directory.
+    # One ArchiveHead in '/CONSERVE' in the root of the archive directory.
     magic @0 :Text;
     # Literal "conserve archive"
 
