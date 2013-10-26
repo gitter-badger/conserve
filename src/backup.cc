@@ -49,7 +49,7 @@ enum ExitCode cmd_backup(char **argv) {
     Archive archive(archive_dir);
 
     BandWriter band = archive.start_band();
-    BlockWriter block = band.start_block();
+    BlockWriter block(band.directory(), 0);
 
     // TODO: Make sure to add the files in the right order.
     for (unsigned i = 0; i < source_names.size(); i++) {

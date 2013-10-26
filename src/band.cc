@@ -79,11 +79,6 @@ void BandWriter::start() {
 }
 
 
-BlockWriter BandWriter::start_block() {
-    return BlockWriter(directory(), 0);
-}
-
-
 void BandWriter::finish() {
     MallocMessageBuilder message;
     BandTail::Builder tail_pb = message.initRoot<BandTail>();

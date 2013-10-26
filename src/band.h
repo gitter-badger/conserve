@@ -64,7 +64,6 @@ private:
 class BandWriter : public Band {
 public:
     BandWriter(Archive *archive, string name);
-    BlockWriter start_block();
     void start();
     void finish();
 
