@@ -14,7 +14,10 @@
 #ifndef CONSERVE_BLOCKWRITER_H
 #define CONSERVE_BLOCKWRITER_H
 
-#include <stdio.h>
+#include <vector>
+
+#include <capnp/message.h>
+#include <capnp/orphan.h>
 
 #include "proto/conserve.capnp.h"
 #include "bzdatawriter.h"
@@ -25,6 +28,8 @@ namespace conserve {
 class BandWriter;
 
 using namespace boost::filesystem;
+using namespace capnp;
+using namespace conserve::proto;
 
 
 class BlockWriter : public Block {
@@ -35,8 +40,11 @@ public:
     void add_file(const path&);
 
 private:
+    MallocMessageBuilder builder_;
+    Orphanage orphanage_;
+
     // Accumulates index entries as files are added.
-    conserve::proto::BlockIndex index_proto_;
+    vector<Orphan<FileIndex>> index_orphans_;
     BzDataWriter data_writer_;
 
     // Last path accumulated, so that we can validate correct ordering.

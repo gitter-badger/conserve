@@ -33,15 +33,19 @@
 
 namespace conserve {
 
-using namespace std;
-using namespace boost;
 using namespace boost::filesystem;
+using namespace boost;
+using namespace capnp;
+using namespace conserve::proto;
+using namespace std;
 
 const size_t copy_buf_size = 64 << 10;
 
 
 BlockWriter::BlockWriter(path directory, int block_number) :
     Block(directory, block_number),
+    builder_(),
+    orphanage_(builder_.getOrphanage()),
     data_writer_(data_filename_)
 {
 }
@@ -57,9 +61,13 @@ void BlockWriter::add_file(const path& source_path) {
     data_writer_.store_file(source_path, &content_len);
     CHECK(content_len >= 0);
 
-    proto::FileIndex* file_index = index_proto_.add_file();
-    break_path(source_path, file_index->mutable_path());
-    file_index->set_data_length(content_len);
+    index_orphans_.push_back(orphanage_.newOrphan<FileIndex>());
+    // TODO: Inelegant!
+    FileIndex::Builder file_index_builder = index_orphans_[index_orphans_.size()-1].get();
+    Path::Builder path_pb;
+    break_path(source_path, &path_pb);
+    file_index_builder.setPath(path_pb);
+    file_index_builder.setDataLength(content_len);
 
     last_path_stored_ = source_path;
 }
@@ -67,13 +75,22 @@ void BlockWriter::add_file(const path& source_path) {
 
 void BlockWriter::finish() {
     // TODO: Finish the data block first to check it's complete?
+    BlockIndex::Builder block_pb = builder_.initRoot<BlockIndex>();
 
-    populate_stamp(index_proto_.mutable_stamp());
+    auto file_list_pb = block_pb.initFile(index_orphans_.size());
+    for (unsigned i = 0; i < index_orphans_.size(); i++) {
+        // TODO: Seems like we should be able to adopt it but that seems to
+        // cause move-semantics problems with the vector?
+        file_list_pb.setWithCaveats(i, index_orphans_[i].getReader());
+    }
+
+    block_pb.setStamp(make_stamp());
 
     // TODO: Accumulate size and hash as we write the data file, and store it
     // into the index.
-    index_proto_.set_compression(proto::BZIP2);
-    write_proto_to_file(index_proto_, index_path_);
+    block_pb.setCompression(Compression::BZIP2);
+
+    write_packed_message_to_file(builder_, index_path_);
     LOG(INFO) << "write block index in " << index_path_;
 }
 
