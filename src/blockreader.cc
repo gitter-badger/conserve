@@ -50,18 +50,18 @@ BlockReader::BlockReader(path directory, int block_number) :
 
 
 path BlockReader::file_path() const {
-    CHECK(file_number_ < index_pb_.file_size());
-    return unpack_path(index_pb_.file(file_number_).path());
+    CHECK(file_number_ < (int) index_pb_.getFile().size());
+    return unpack_path(index_pb_.getFile()[file_number_].getPath());
 }
 
 
-const proto::FileIndex& BlockReader::file_index() const {
-    return index_pb_.file(file_number_);
+const proto::FileIndex::Reader BlockReader::file_index() const {
+    return index_pb_.getFile()[file_number_];
 }
 
 
 bool BlockReader::done() const {
-    return file_number_ >= index_pb_.file_size();
+    return file_number_ >= (int) index_pb_.getFile().size();
 }
 
 
@@ -77,10 +77,11 @@ void BlockReader::restore_file(const path &restore_path) {
             O_CREAT | O_EXCL | O_NOFOLLOW | O_WRONLY,
             0666);
     PCHECK(to_fd != -1);
-    const proto::FileIndex& file_index = index_pb_.file(file_number_);
-    LOG(INFO) << "attempt to restore " << file_index.data_length()
+    const proto::FileIndex::Reader index = file_index();
+    const uint64_t file_length = index.getDataLength();
+    LOG(INFO) << "attempt to restore " << file_length
         << " bytes to " << restore_path.string();
-    data_reader_.extract_to_fd(file_index.data_length(), to_fd);
+    data_reader_.extract_to_fd(file_length, to_fd);
     PCHECK(!close(to_fd));
 }
 

@@ -36,7 +36,7 @@ public:
     path file_path() const;
     void advance();
     bool done() const;
-    const proto::FileIndex& file_index() const;
+    const proto::FileIndex::Reader file_index() const;
     
     // Restore the current file to the given output path.
     void restore_file(const path &restore_path);
