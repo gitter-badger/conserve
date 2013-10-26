@@ -19,7 +19,7 @@
 
 #include <glog/logging.h>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "archive.h"
 #include "backup.h"
@@ -30,8 +30,6 @@
 #include "validate.h"
 
 using namespace std;
-using namespace google::protobuf::io;
-using namespace google::protobuf;
 
 namespace conserve {
 

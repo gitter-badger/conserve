@@ -15,10 +15,7 @@
 
 #include <glog/logging.h>
 
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/text_format.h>
-
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "archive.h"
 #include "band.h"
@@ -28,8 +25,6 @@
 
 
 using namespace std;
-using namespace google::protobuf::io;
-using namespace google::protobuf;
 
 namespace conserve {
 

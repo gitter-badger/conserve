@@ -23,7 +23,7 @@
 
 #include <glog/logging.h>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "archive.h"
 #include "band.h"
@@ -32,9 +32,11 @@
 
 namespace conserve {
 
-using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
+using namespace capnp;
+using namespace conserve::proto;
+using namespace std;
 
 
 Block::Block(path directory, int block_number) :

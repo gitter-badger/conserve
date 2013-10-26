@@ -23,9 +23,6 @@
 
 #include <glog/logging.h>
 
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-
 #include "proto/conserve.capnp.h"
 #include "util.h"
 #include "problem.h"
@@ -36,8 +33,6 @@ using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 using namespace capnp;
-using namespace google::protobuf::io;
-using namespace google::protobuf;
 using namespace conserve::proto;
 
 void write_packed_message_to_file(

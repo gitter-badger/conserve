@@ -23,7 +23,7 @@
 
 #include <glog/logging.h>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "archive.h"
 #include "band.h"
