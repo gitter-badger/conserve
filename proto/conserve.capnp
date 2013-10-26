@@ -25,7 +25,7 @@ struct ArchiveHead {
     requiredWriteFlags @2 :List(Text);
     # Clients must understand these features to safely write the archive.
 
-    initStamp @3 :Stamp;
+    stamp @3 :Stamp;
 }
 
 enum FileType {
