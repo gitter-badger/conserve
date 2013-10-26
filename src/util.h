@@ -14,16 +14,13 @@
 #include <string>
 
 #include <capnp/serialize.h>
+#include "proto/conserve.capnp.h"
 
 namespace conserve {
 
 using namespace boost::filesystem;
+using namespace conserve::proto;
 using namespace std;
-
-namespace proto {
-    class Stamp;
-    class Path;
-};
 
 void write_packed_message_to_file(
         ::capnp::MessageBuilder& message,
@@ -38,11 +35,12 @@ std::string gethostname_str();
 
 void break_path(
         const boost::filesystem::path &from_path,
-        conserve::proto::Path::Builder *to_path_proto);
+        Path::Builder *to_path_proto);
 
-path unpack_path(const conserve::proto::Path::Reader &proto_path);
+path unpack_path(const Path::Reader &proto_path);
 
-void populate_stamp(conserve::proto::Stamp::Builder *stamp);
+Stamp::Builder make_stamp();
+
 }
 
 // vim: sw=4 et

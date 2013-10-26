@@ -53,8 +53,8 @@ public:
 
 private:
     int current_block_number_;
-    proto::BandHead head_pb_;
-    proto::BandTail tail_pb_;
+    proto::BandHead::Reader head_pb_;
+    proto::BandTail::Reader tail_pb_;
 };
 
 

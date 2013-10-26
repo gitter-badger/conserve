@@ -24,7 +24,7 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
-#include "proto/conserve.pb.h"
+#include "proto/conserve.capnp.h"
 
 #include "archive.h"
 #include "band.h"
@@ -34,8 +34,10 @@
 
 namespace conserve {
 
-using namespace std;
 using namespace boost;
+using namespace capnp;
+using namespace conserve::proto;
+using namespace std;
 
 
 const string Band::HEAD_NAME = "BANDHEAD";
@@ -70,11 +72,13 @@ path Band::tail_file_name() const {
 void BandWriter::start() {
     LOG(INFO) << "start band in " << band_directory_;
     filesystem::create_directory(band_directory_);
-    proto::BandHead head_pb;
-    head_pb.set_band_number(name_);
-    populate_stamp(head_pb.mutable_stamp());
-    write_proto_to_file(head_pb,
-        head_file_name());
+
+    MallocMessageBuilder message;
+    BandHead::Builder head_pb = message.initRoot<BandHead>();
+    head_pb.getBandId().setBandNumber(Text::Reader(name_));
+    head_pb.setStamp(make_stamp());
+
+    write_packed_message_to_file(message, head_file_name());
 }
 
 
@@ -84,11 +88,13 @@ BlockWriter BandWriter::start_block() {
 
 
 void BandWriter::finish() {
-    proto::BandTail tail_pb;
-    tail_pb.set_band_number(name_);
-    populate_stamp(tail_pb.mutable_stamp());
+    MallocMessageBuilder message;
+    BandTail::Builder tail_pb = message.initRoot<BandTail>();
+    tail_pb.getBandId().setBandNumber(Text::Reader(name_));
+    tail_pb.setStamp(make_stamp());
+
     // TODO(mbp): Write block count
-    write_proto_to_file(tail_pb, tail_file_name());
+    write_packed_message_to_file(message, tail_file_name());
     LOG(INFO) << "finish band in " << band_directory_;
 }
 
@@ -103,16 +109,24 @@ BandReader::BandReader(Archive *archive, string name) :
     Band(archive, name),
     current_block_number_(-1)
 {
-    read_proto_from_file(head_file_name(), &head_pb_, "band", "head");
-    read_proto_from_file(tail_file_name(), &tail_pb_, "band", "tail");
-    LOG(INFO) << "start reading band " << head_pb_.band_number();
-    CHECK(head_pb_.band_number() == tail_pb_.band_number());
-    CHECK(tail_pb_.block_count() >= 0);
+    unique_ptr<MessageReader> head_reader(
+        read_packed_message_from_file(
+            head_file_name(), "band", "head"));
+    head_pb_ = head_reader->getRoot<BandHead>();
+
+    unique_ptr<MessageReader> tail_reader(
+        read_packed_message_from_file(
+            tail_file_name(), "band", "tail"));
+    tail_pb_ = tail_reader->getRoot<BandTail>();
+
+    LOG(INFO) << "start reading band " << head_pb_.getBandId().getBandNumber();
+    CHECK(head_pb_.getBandId().getBandNumber() == tail_pb_.getBandId().getBandNumber());
+    CHECK(tail_pb_.getBlockCount() >= 0);
 }
 
 
 bool BandReader::done() const {
-    return current_block_number_ >= tail_pb_.block_count();
+    return current_block_number_ >= (int) tail_pb_.getBlockCount();
 }
 
 

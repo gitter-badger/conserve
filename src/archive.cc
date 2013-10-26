@@ -65,9 +65,12 @@ Archive::Archive(const path& base_dir) :
 void Archive::create(const path& base_dir) {
     LOG(INFO) << "create archive in " << base_dir;
     filesystem::create_directory(base_dir);
-    ::capnp::MallocMessageBuilder message;
+
+    MallocMessageBuilder message;
     ArchiveHead::Builder head_pb = message.initRoot<ArchiveHead>();
     head_pb.setMagic(Text::Reader(ARCHIVE_MAGIC));
+    head_pb.setStamp(make_stamp());
+
     write_packed_message_to_file(message, base_dir / HEAD_NAME);
 }
 

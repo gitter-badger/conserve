@@ -71,10 +71,13 @@ string gethostname_str() {
     return string(hostname);
 }
 
-void populate_stamp(Stamp::Builder *stamp) {
-    stamp->setUnixtime(time(0));
-    stamp->setHostname(Text::Reader(gethostname_str()));
-    stamp->setSoftwareVersion(PACKAGE_VERSION);
+
+Stamp::Builder make_stamp() {
+    Stamp::Builder stamp;
+    stamp.setUnixtime(time(0));
+    stamp.setHostname(Text::Reader(gethostname_str()));
+    stamp.setSoftwareVersion(PACKAGE_VERSION);
+    return stamp;
 }
 
 
