@@ -11,6 +11,8 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
+#include <memory>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -29,10 +31,10 @@
 
 namespace conserve {
 
-using namespace std;
-
 using namespace boost;
+using namespace capnp;
 using namespace conserve::proto;
+using namespace std;
 
 
 const string Archive::_HARDCODED_SINGLE_BAND = "0000";
@@ -45,7 +47,12 @@ Archive::Archive(const path& base_dir) :
 {
     LOG(INFO) << "open archive in " << base_dir_;
     path head_path = base_dir / HEAD_NAME;
-    read_proto_from_file(head_path, head_pb_, "archive", "head");
+
+    unique_ptr<MessageReader> reader(
+        read_packed_message_from_file(
+            head_path, "archive", "head"));
+    head_pb_ = reader->getRoot<ArchiveHead>();
+
     string actualMagic = head_pb_.getMagic();
     if (actualMagic != ARCHIVE_MAGIC) {
         Problem("archive", "head", "bad-magic", head_path,
@@ -60,7 +67,7 @@ void Archive::create(const path& base_dir) {
     filesystem::create_directory(base_dir);
     ::capnp::MallocMessageBuilder message;
     ArchiveHead::Builder head_pb = message.initRoot<ArchiveHead>();
-    head_pb.setMagic(ARCHIVE_MAGIC);
+    head_pb.setMagic(Text::Reader(ARCHIVE_MAGIC));
     write_packed_message_to_file(message, base_dir / HEAD_NAME);
 }
 
