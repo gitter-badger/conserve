@@ -50,12 +50,12 @@ BlockReader::BlockReader(path directory, int block_number) :
 
 
 path BlockReader::file_path() const {
-    CHECK(file_number_ < (int) index_pb_.getFile().size());
-    return unpack_path(index_pb_.getFile()[file_number_].getPath());
+    return unpack_path(file_index().getPath());
 }
 
 
 const proto::FileIndex::Reader BlockReader::file_index() const {
+    CHECK(file_number_ < (int) index_pb_.getFile().size());
     return index_pb_.getFile()[file_number_];
 }
 
